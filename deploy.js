@@ -24,7 +24,6 @@ async function deploy() {
     let ipfsHash = ipfsFile.hash
     let size = ipfsFile.size
     let name = ipfsFile.path
-    
 
     if (ipfsHash == info.ipfsHash) {
 	throw "Wrong IPFS Hashes"
@@ -49,7 +48,8 @@ async function deploy() {
     //setup bundle
     let bundleNonce = Math.floor(Math.random()*Math.pow(2, 30))
     bundleID = await tbFileSystem.methods.calcId(bundleNonce).call({from: account})
-    await tbFileSystem.methods.makeBundle(bundleNonce).send({from: account, gas: 300000})
+
+    // await tbFileSystem.methods.makeBundle(bundleNonce).send({from: account, gas: 300000})
 
     //setup file
     let fileNonce = Math.floor(Math.random()*Math.pow(2, 30))
@@ -65,23 +65,24 @@ async function deploy() {
 	artifacts.incentiveLayer.address,
 	artifacts.tru.address,
 	artifacts.fileSystem.address,
-	artifacts.depositsManager.address,
-	bundleID,
+	// artifacts.depositsManager.address,
+	//bundleID,
 	codeFileID,
 	initHash
     ]
 
     let contract = new web3.eth.Contract(abi)
-    
+
     let c = await contract.deploy({data: "0x" + bin, arguments: args}).send(options)
 
     let tru = new web3.eth.Contract(artifacts.tru.abi, artifacts.tru.address)
 
-    tru.methods.transfer(c._address, "100000000000").send({from: accounts[0], gas:200000})
+    tru.methods.transfer(c.options.address, "100000000000").send({from: accounts[0], gas:200000})
 
     fs.writeFileSync("export.json", JSON.stringify({
-	address: c._address,
-	abi: c._jsonInterface
+	address: c.options.address,
+	abi: abi,
+	truebit: artifacts.incentiveLayer,
     }))
 
     console.log("Contract has been deployed")

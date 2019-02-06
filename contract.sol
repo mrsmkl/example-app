@@ -23,10 +23,7 @@ interface TrueBit {
                                   uint8 stack, uint8 mem, uint8 globals, uint8 table, uint8 call, uint32 limit) external returns (bytes32);
    function requireFile(bytes32 id, bytes32 hash, /* Storage */ uint st) external;
    function commitRequiredFiles(bytes32 id) external;
-}
-
-interface DepositsManager {
-     function makeDeposit(uint _deposit) external payable returns (uint);
+   function makeDeposit(uint _deposit) external payable returns (uint);
 }
 
 interface TRU {
@@ -44,9 +41,7 @@ contract Scrypt {
    TrueBit truebit;
    Filesystem filesystem;
    TRU tru;
-   DepositsManager depositsManager;
 
-   bytes32 bundleID;
    bytes32 codeFileID;
    bytes32 initHash;
 
@@ -54,14 +49,12 @@ contract Scrypt {
    mapping (bytes32 => bytes) task_to_string;
    mapping (bytes => bytes32) result;
 
-   constructor(address tb, address tru_, address fs, address _depositsManager, bytes32 _bundleID, bytes32 _codeFileID, bytes32 _initHash) public {
+   constructor(address tb, address tru_, address fs, bytes32 _codeFileID, bytes32 _initHash) public {
        truebit = TrueBit(tb);
        tru = TRU(tru_);
        filesystem = Filesystem(fs);
-       bundleID = _bundleID;
        codeFileID = _codeFileID;
        initHash = _initHash;
-       depositsManager = DepositsManager(_depositsManager);
    }
 
    function formatData(bytes memory data) public pure returns (bytes32[] memory output) {
@@ -85,7 +78,9 @@ contract Scrypt {
 
       bytes32[] memory input = formatData(data);
       emit InputData(input);
-      
+
+      bytes32 bundleID = filesystem.makeBundle(num);
+
       bytes32 inputFileID = filesystem.createFileWithContents("input.data", num, input, data.length);
       string_to_file[data] = inputFileID;
       filesystem.addToBundle(bundleID, inputFileID);
@@ -94,17 +89,16 @@ contract Scrypt {
       filesystem.addToBundle(bundleID, filesystem.createFileWithContents("output.data", num+1000000000, empty, 0));
       
       filesystem.finalizeBundle(bundleID, codeFileID);
-      
-      tru.approve(address(depositsManager), 1000);
-      depositsManager.makeDeposit(1000);
-      // string memory bstr = ;
+ 
+      tru.approve(address(truebit), 1000);
+      truebit.makeDeposit(1000);
       bytes32 task = truebit.createTaskWithParams(filesystem.getInitHash(bundleID), 1, bundleID, 1, 1, 20, 20, 8, 20, 10, 5000);
       truebit.requireFile(task, filesystem.hashName("output.data"), 0);
       truebit.commitRequiredFiles(task);
       task_to_string[task] = data;
       return filesystem.getInitHash(bundleID);
    }
-   
+
    bytes32 remember_task;
 
    // this is the callback name
@@ -122,5 +116,5 @@ contract Scrypt {
    function scrypt(bytes memory data) public view returns (bytes32) {
       return result[data];
    }
-   
+
 }
