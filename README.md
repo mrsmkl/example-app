@@ -67,7 +67,7 @@ Task is finalized, and result should show up on the web page.
 # Running in Docker
 
 ```
-docker run -it -p 8545:8545 -p 3000:80 -p 4001:4001 -p 30303:30303 truebit-os:latest /bin/bash
+docker run -it -p 8545:8545 -p 3000:80 -p 4001:4001 -p 30303:30303 mrsmkl/truebit-os:latest /bin/bash
 ```
 
 Use tmux to have several windows. New windows are made with "Ctrl-b c".
@@ -100,7 +100,7 @@ Then make a new tmux window
 ```
 cd example-app
 node deploy.js
-service start apache2
+service apache2 start
 ```
 
 With web browser, go to localhost:3000/app
