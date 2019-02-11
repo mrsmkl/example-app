@@ -20,18 +20,18 @@ function getTruebitScrypt(data) {
 	    gotFilesEvent.watch(function(err, result) {
 		if (result) {
 		    gotFilesEvent.stopWatching(x => {})
-		    resolve(result.args.files[0])		    
+		    resolve(result.args.files[0])
 		} else if(err) {
 		    reject()
 		}
-	    })	    
+	    })
 	})
     }).then(function(fileID) {
 	return fileSystem.getData.call(fileID)
     }).then(function(lst) {
 	return lst[0]
     })
-    
+
 }
 
 function calcScrypt(str) {
@@ -48,7 +48,7 @@ window.runScrypt = function () {
 
     getTruebitScrypt(data).then(function(truHash) {
 	document.getElementById('tb-scrypt').innerHTML = showTruebitScrypt(truHash)
-    })    
+    })
 }
 
 function getArtifacts(networkName) {
@@ -75,11 +75,11 @@ function getArtifacts(networkName) {
 
 	    scryptSubmitter = await scryptSubmitter.at(artifacts.scrypt.address)
 
-	    account = window.web3.eth.defaultAccount	   
+	    account = window.web3.eth.defaultAccount
 	}
     }
 
-    httpRequest.open('GET', '/contracts?network=' + networkName)
+    httpRequest.open('GET', networkName + '.json')
     httpRequest.send()
 }
 

@@ -65,8 +65,6 @@ async function deploy() {
 	artifacts.incentiveLayer.address,
 	artifacts.tru.address,
 	artifacts.fileSystem.address,
-	// artifacts.depositsManager.address,
-	//bundleID,
 	codeFileID,
 	initHash
     ]
@@ -79,13 +77,12 @@ async function deploy() {
 
     tru.methods.transfer(c.options.address, "100000000000").send({from: accounts[0], gas:200000})
 
-    fs.writeFileSync("export.json", JSON.stringify({
-	address: c.options.address,
-	abi: abi,
-	truebit: artifacts.incentiveLayer,
-    }))
+    artifacts["scrypt"] = {address: c.options.address, abi: abi}
+
+    fs.writeFileSync("public/" + networkName + ".json", JSON.stringify(artifacts))
 
     console.log("Contract has been deployed")
 }
 
 deploy()
+
