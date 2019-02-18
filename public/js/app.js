@@ -48,8 +48,10 @@ function calcScrypt(str) {
 
 window.runScrypt = function () {
     data = document.getElementById('input-data').value
-    hash = calcScrypt(data)
-    scryptSubmitter.submitData(data, {gas: 2000000, from: account}).then(function(txHash) {
+	hash = calcScrypt(data)
+	let dta = "0x" + Buffer.from(data).toString("hex")
+	console.log(dta)
+    scryptSubmitter.submitData(dta, {gas: 2000000, from: account}).then(function(txHash) {
 		console.log("Submitted", txHash)
 	})
     document.getElementById('js-scrypt').innerHTML += data + ": " + "0x" + s.to_hex(hash) + "<br>"
