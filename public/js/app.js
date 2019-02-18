@@ -1,36 +1,41 @@
 const truffleContract = require('truffle-contract')
 
-function showJSScrypt(hash) {
-    return "<div>Scrypt Hash from js-scrypt:</div> <div>" + hash + "</div>"
-}
-
-function showTruebitScrypt(hash) {
-    return "<div>Scrypt Hash from TrueBit solver:</div> <div>" + hash + "</div>"
-}
-
 var fileSystem, scryptSubmitter, account
 
-function getTruebitScrypt(data) {
+var listening = false
 
-    return scryptSubmitter.submitData(data, {gas: 2000000, from: account}).then(function(txHash) {
+var hashes = {}
 
-	const gotFilesEvent = scryptSubmitter.GotFiles()
+function listenEvents() {
 
-	return new Promise((resolve, reject) => {
-	    gotFilesEvent.watch(function(err, result) {
+	if (listening) return
+	listening = true
+
+	scryptSubmitter.FinishedTask().watch(function(err, result) {
 		if (result) {
-		    gotFilesEvent.stopWatching(x => {})
-		    resolve(result.args.files[0])
+			console.log(result)
+			if (hashes[result.transactionHash]) return
+			hashes[result.transactionHash] = true
+			let hash = result.args.result
+			let data = Buffer.from(result.args.data.substr(2), "hex").toString()
+			document.getElementById('tb-scrypt').innerHTML += data + ": " + hash + "<br>"
 		} else if(err) {
-		    reject()
+			console.error(err)
 		}
-	    })
 	})
-    }).then(function(fileID) {
-	return fileSystem.getData.call(fileID)
-    }).then(function(lst) {
-	return lst[0]
-    })
+
+	scryptSubmitter.NewTask().watch(function(err, result) {
+		if (result) {
+			console.log(result)
+			if (hashes[result.transactionHash]) return
+			hashes[result.transactionHash] = true
+			let data = Buffer.from(result.args.data.substr(2), "hex").toString()
+			// let data = result.args.data
+			document.getElementById('tb-scrypt').innerHTML += "Submitted task " + data + "<br>"
+		} else if(err) {
+			console.error(err)
+		}
+	})
 
 }
 
@@ -44,11 +49,10 @@ function calcScrypt(str) {
 window.runScrypt = function () {
     data = document.getElementById('input-data').value
     hash = calcScrypt(data)
-    document.getElementById('js-scrypt').innerHTML = showJSScrypt("0x" + s.to_hex(hash))
-
-    getTruebitScrypt(data).then(function(truHash) {
-	document.getElementById('tb-scrypt').innerHTML = showTruebitScrypt(truHash)
-    })
+    scryptSubmitter.submitData(data, {gas: 2000000, from: account}).then(function(txHash) {
+		console.log("Submitted", txHash)
+	})
+    document.getElementById('js-scrypt').innerHTML += data + ": " + "0x" + s.to_hex(hash) + "<br>"
 }
 
 function getArtifacts(networkName) {
@@ -75,7 +79,9 @@ function getArtifacts(networkName) {
 
 	    scryptSubmitter = await scryptSubmitter.at(artifacts.scrypt.address)
 
-	    account = window.web3.eth.defaultAccount
+		account = window.web3.eth.defaultAccount
+		
+		listenEvents()
 	}
     }
 
