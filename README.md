@@ -66,7 +66,11 @@ Task is finalized, and result should show up on the web page.
 
 # Running in Docker
 
-Use tmux to have several windows.
+```
+docker run -it -p 8545:8545 -p 3000:80 -p 4001:4001 -p 30303:30303 mrsmkl/truebit-os:latest /bin/bash
+```
+
+Use tmux to have several windows. New windows are made with "Ctrl-b c".
 
 In first windows, run `ipfs daemon`
 
@@ -82,6 +86,11 @@ node send.js --to=address
 npm run truebit
 ```
 
+To run truebit client in JIT solving mode, use
+```
+npm run truebit wasm-client/config-jit.json
+```
+
 In the Truebit console, type
 ```
 start solve
@@ -91,12 +100,20 @@ Then make a new tmux window
 ```
 cd example-app
 node deploy.js
-node index.js
+service apache2 start
 ```
 
-With web browser, go to localhost:3000
+With web browser, go to localhost:3000/app
 
 After you have submitted the task, go to the tmux window with Truebit console, and type
  `skip` a few times until the task is finalized.
 
 
+Pairing sample:
+
+```
+cd /wasm-ports/samples/pairing/
+node ../deploy.js
+```
+
+This page will be at `localhost:3000/samples/pairing/public`
