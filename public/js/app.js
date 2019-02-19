@@ -58,6 +58,7 @@ window.runScrypt = function () {
 }
 
 function getArtifacts(networkName) {
+            console.log("getting artifacts", networkName)
     httpRequest = new XMLHttpRequest()
 
     httpRequest.onreadystatechange = async function() {
@@ -100,12 +101,15 @@ function init() {
 
 	//alert(networkType)
 	window.web3.version.getNetwork((err, netId) => {
+            console.log("netid", netId)
 	    if(netId == '1') {
 		getArtifacts('main')
 	    } else if(netId == '3') {
 		getArtifacts('ropsten')
 	    } else if(netId == '4') {
 		getArtifacts('rinkeby')
+	    } else if(netId == '5') {
+		getArtifacts('goerli')
 	    } else if(netId == '42') {
 		getArtifacts('kovan')
 	    } else {
