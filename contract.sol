@@ -87,10 +87,10 @@ contract Scrypt {
       filesystem.addToBundle(bundleID, filesystem.createFileWithContents("output.data", num+1000000000, empty, 0));
       
       filesystem.finalizeBundle(bundleID, codeFileID);
- 
-      tru.approve(address(truebit), 1000);
-      truebit.makeDeposit(1000);
-      bytes32 task = truebit.createTaskWithParams(filesystem.getInitHash(bundleID), 1, bundleID, 1, 1, 20, 20, 8, 20, 10, 5000);
+
+      tru.approve(address(truebit), 6 ether);
+      truebit.makeDeposit(6 ether);
+      bytes32 task = truebit.createTaskWithParams(filesystem.getInitHash(bundleID), 1, bundleID, 1, 1 ether, 20, 20, 8, 20, 10, 5000);
       truebit.requireFile(task, filesystem.hashName("output.data"), 0);
       truebit.commitRequiredFiles(task);
       task_to_string[task] = data;

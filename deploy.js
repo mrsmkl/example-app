@@ -82,7 +82,7 @@ async function deploy() {
 
     let tru = new web3.eth.Contract(artifacts.tru.abi, artifacts.tru.address)
 
-    tru.methods.transfer(c.options.address, "100000000000").send({from: accounts[0], gas:200000})
+    tru.methods.transfer(c.options.address, "1000000000000000000000").send({from: accounts[0], gas:200000})
 
     artifacts["scrypt"] = {address: c.options.address, abi: abi}
 
