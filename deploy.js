@@ -12,13 +12,9 @@ const host = "http://localhost:8545"
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider(host))
 
-const merkleRoot = require('./merkleRoot')
+const merkleRoot = require('truebit-util').merkleRoot.web3
 
-const getNetwork = async () => {
-    let id = await web3.eth.net.getId()
-    if (id == 5) return "goerli"
-    else return await web3.eth.net.getNetworkType()
-}
+const getNetwork = require('truebit-util').getNetwork
 
 async function deploy() {
 
@@ -38,7 +34,7 @@ async function deploy() {
     //Deploy contract with appropriate artifacts
 
 //    let networkName = await web3.eth.net.getNetworkType()
-    let networkName = await getNetwork()
+    let networkName = await getNetwork(web3)
 
     let artifacts = JSON.parse(fs.readFileSync('./truebit-os/wasm-client/' + networkName + '.json'))
 
