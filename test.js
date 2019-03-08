@@ -7,11 +7,7 @@ const assert = require('assert')
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider(host))
 
-const getNetwork = async () => {
-    let id = await web3.eth.net.getId()
-    if (id == 5) return "goerli"
-    else return await web3.eth.net.getNetworkType()
-}
+const getNetwork = require('truebit-utils').getNetwork
 
 let account, fileSystem, scryptSubmitter
 
@@ -28,28 +24,13 @@ describe('Truebit Scrypt test', async function() {
     })
 
     it('connect to contracts', async () => {
-        let networkName = await getNetwork()
+        let networkName = await getNetwork(web3)
 
-	    //get scrypt submitter artifact
-	    const artifacts = JSON.parse(fs.readFileSync("public/" + networkName + ".json"))
+	//get scrypt submitter artifact
+	const artifacts = JSON.parse(fs.readFileSync("public/" + networkName + ".json"))
 
-	    // fileSystem = new web3.eth.Contract(artifacts.fileSystem.abi, artifacts.fileSystem.address)
+        // fileSystem = new web3.eth.Contract(artifacts.fileSystem.abi, artifacts.fileSystem.address)
         scryptSubmitter = new web3.eth.Contract(artifacts.scrypt.abi, artifacts.scrypt.address)
-        
-        /*
-
-	    fileSystem.setProvider(window.web3.currentProvider)
-
-	    fileSystem = await fileSystem.at()
-
-	    scryptSubmitter = truffleContract({
-		abi: artifacts.scrypt.abi
-	    })
-
-	    scryptSubmitter.setProvider(window.web3.currentProvider)
-
-	    scryptSubmitter = await scryptSubmitter.at(artifacts.scrypt.address)
-*/
 
     })
 
